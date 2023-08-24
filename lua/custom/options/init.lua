@@ -1,6 +1,7 @@
 -- nvim custom options file
 -- Author: TragDate
-
+vim.g.loaded_netrw = 1
+vim.g.loaded_netrwPlugin = 1
 -- Hide cmdbar if there is nothing to display
 vim.opt.cmdheight = 0
 -- Keep cursor in the middle of the screen
