@@ -1,7 +1,7 @@
 --[[
-
+/
 =====================================================================
-==================== READ THIS BEFORE CONTINUING ====================
+=================== READ THIS BEFORE CONTINUING ====================
 =====================================================================
 
 Kickstart.nvim is *not* a distribution.
@@ -42,7 +42,7 @@ P.S. You can delete this when you're done too. It's your config now :)
 --  NOTE: Must happen before plugins are required (otherwise wrong leader will be used)
 vim.g.mapleader = ' '
 vim.g.maplocalleader = ' '
--- { import = 'custom.plugins' },
+require('custom.options')
 -- Install package manager
 --    https://github.com/folke/lazy.nvim
 --    `:help lazy.nvim.txt` for more info
@@ -136,23 +136,23 @@ require('lazy').setup({
     'navarasu/onedark.nvim',
     priority = 1000,
     config = function()
-      vim.cmd.colorscheme 'onedark'
+      vim.cmd.colorscheme 'sonokai'
     end,
   },
 
-  {
-    -- Set lualine as statusline
-    'nvim-lualine/lualine.nvim',
-    -- See `:help lualine.txt`
-    opts = {
-      options = {
-        icons_enabled = false,
-        theme = 'onedark',
-        component_separators = '|',
-        section_separators = '',
-      },
-    },
-  },
+--  {
+--    -- Set lualine as statusline
+--    'nvim-lualine/lualine.nvim',
+--    -- See `:help lualine.txt`
+--    opts = {
+--      options = {
+--        icons_enabled = false,
+--        theme = 'onedark',
+--        component_separators = '|',
+--        section_separators = '',
+--      },
+--    },
+--  },
 
   {
     -- Add indentation guides even on blank lines
@@ -210,10 +210,8 @@ require('lazy').setup({
   --    Uncomment the following line and add your plugins to `lua/custom/plugins/*.lua` to get going.
   --
   --    For additional information see: https://github.com/folke/lazy.nvim#-structuring-your-plugins
-  { import = 'custom.plugins' },
-  { import = 'custom.options' },
-}, {})
-
+  { import = 'custom.plugins' },}, {})
+require('custom.configs.airline-config')
 -- [[ Setting options ]]
 -- See `:help vim.o`
 -- NOTE: You can change these options as you wish!
