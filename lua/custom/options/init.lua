@@ -1,5 +1,12 @@
 -- nvim custom options file
 -- Author: TragDate
+
+-- Set dynamic window title
+vim.o.title = true
+vim.o.titlestring="%t"
+vim.cmd([[
+  autocmd BufEnter * let &titlestring = expand("%:p")
+]])
 vim.g.loaded_netrw = 1
 vim.g.loaded_netrwPlugin = 1
 -- Hide cmdbar if there is nothing to display
