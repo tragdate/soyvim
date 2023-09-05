@@ -3,6 +3,8 @@
 --
 -- See the kickstart.nvim README for more information
 return {
+  -- MOVE STUFF
+  {'matze/vim-move'},
   -- Color preview for working with hex colors
   {'rrethy/vim-hexokinase'},
   -- Theming / add themes here change from init.lua
