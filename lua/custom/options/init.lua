@@ -15,10 +15,6 @@ vim.opt.cmdheight = 0
 vim.o.scrolloff = 999
 -- Set Font size
 vim.g.font_size = 14
--- Add hotkeys for neovide since it does not support zooming
-vim.api.nvim_set_keymap('n', '<C-=>', ':lua vim.g.font_size = vim.g.font_size + 1; vim.cmd("set guifont=JetBrainsMono\\\\ Nerd\\\\ Font:h" .. vim.g.font_size .. "")<CR>', {noremap = true, silent = true})
-vim.api.nvim_set_keymap('n', '<C-->', ':lua vim.g.font_size = vim.g.font_size - 1; vim.cmd("set guifont=JetBrainsMono\\\\ Nerd\\\\ Font:h" .. vim.g.font_size .. "")<CR>', {noremap = true, silent = true})
-
 -- Add rust build command 
 vim.api.nvim_command("command! CargoBuildRelease :terminal cargo build --release")
 
@@ -40,3 +36,4 @@ function _G.md_to_pdf()
   vim.fn.system("md-to-pdf " .. vim.fn.expand("%:p") .. " --pdf-options='{\"format\": \"A4\", \"margin\": {\"top\": \"10mm\", \"right\": \"20mm\", \"bottom\": \"20mm\", \"left\": \"20mm\"}}'")
 end
 vim.cmd([[autocmd BufWritePost *.2pdf.md lua md_to_pdf()]])
+vim.api.nvim_set_keymap('n', '<leader>c', [[:%s/\s\+\(-H\|-\{2,}\)/ \\\r\1/g<CR>]], { noremap = true, silent = true })
