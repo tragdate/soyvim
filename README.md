@@ -6,6 +6,6 @@
 
 ```bash
 cd ~/.config/nvim
-git clone https://github.com/tragdate/sovim .
+git clone https://github.com/tragdate/soyvim .
 ```
 > Make sure to run `:Lazy update` after installing
