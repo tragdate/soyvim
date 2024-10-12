@@ -8,4 +8,10 @@
 cd ~/.config/nvim
 git clone https://github.com/tragdate/soyvim .
 ```
-> Make sure to run `:Lazy update` after installing
+Make sure to run `:Lazy update` after installing
+
+also for your syntax highlighting colors
+```bash
+cd ~/.local/share/nvim/lazy/vim-hexokinase/
+make hexokinase
+
