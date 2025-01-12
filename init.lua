@@ -7,19 +7,19 @@
 Kickstart.nvim is *not* a distribution.
 
 Kickstart.nvim is a template for your own configuration.
-  The goal is that you can read every line of code, top-to-bottom, understand
-  what your configuration is doing, and modify it to suit your needs.
+The goal is that you can read every line of code, top-to-bottom, understand
+what your configuration is doing, and modify it to suit your needs.
 
-  Once you've done that, you should start exploring, configuring and tinkering to
-  explore Neovim!
+Once you've done that, you should start exploring, configuring and tinkering to
+explore Neovim!
 
-  If you don't know anything about Lua, I recommend taking some time to read through
-  a guide. One possible example:
-  - https://learnxinyminutes.com/docs/lua/
+If you don't know anything about Lua, I recommend taking some time to read through
+a guide. One possible example:
+- https://learnxinyminutes.com/docs/lua/
 
 
-  And then you can explore or search through `:help lua-guide`
-  - https://neovim.io/doc/user/lua-guide.html
+And then you can explore or search through `:help lua-guide`
+- https://neovim.io/doc/user/lua-guide.html
 
 
 Kickstart Guide:
@@ -40,6 +40,7 @@ P.S. You can delete this when you're done too. It's your config now :)
 -- Set <space> as the leader key
 -- See `:help mapleader`
 --  NOTE: Must happen before plugins are required (otherwise wrong leader will be used)
+
 vim.g.mapleader = ' '
 vim.g.maplocalleader = ' '
 require('custom.options')
@@ -140,19 +141,19 @@ require('lazy').setup({
     end,
   },
 
---  {
---    -- Set lualine as statusline
---    'nvim-lualine/lualine.nvim',
---    -- See `:help lualine.txt`
---    opts = {
---      options = {
---        icons_enabled = false,
---        theme = 'onedark',
---        component_separators = '|',
---        section_separators = '',
---      },
---    },
---  },
+  --  {
+  --    -- Set lualine as statusline
+  --    'nvim-lualine/lualine.nvim',
+  --    -- See `:help lualine.txt`
+  --    opts = {
+  --      options = {
+  --        icons_enabled = false,
+  --        theme = 'onedark',
+  --        component_separators = '|',
+  --        section_separators = '',
+  --      },
+  --    },
+  --  },
 
   -- {
   --   -- Add indentation guides even on blank lines
@@ -312,7 +313,7 @@ vim.keymap.set('n', '<leader>sd', require('telescope.builtin').diagnostics, { de
 -- See `:help nvim-treesitter`
 require('nvim-treesitter.configs').setup {
   -- Add languages to be installed here that you want installed for treesitter
-  ensure_installed = { 'c', 'cpp', 'go', 'lua', 'python', 'rust', 'tsx', 'typescript', 'vimdoc', 'vim' },
+  ensure_installed = { 'c', 'cpp', 'go', 'lua', 'python', 'rust', 'tsx', 'typescript', 'vimdoc', 'vim', 'php'  },
 
   -- Autoinstall languages that are not installed. Defaults to false (but you can change for yourself!)
   auto_install = false,
@@ -433,14 +434,14 @@ end
 --
 --  If you want to override the default filetypes that your language server will attach to you can
 --  define the property 'filetypes' to the map in question.
-local servers = {
-  -- clangd = {},
-  -- gopls = {},
-  -- pyright = {},
-  -- rust_analyzer = {},
-  -- tsserver = {},
-  -- html = { filetypes = { 'html', 'twig', 'hbs'} },
 
+local servers = {
+  rust_analyzer = {
+    cmd = { "/home/tragdate/.local/share/nvim/mason/bin/rust-analyzer" },
+    capabilities = {
+      offsetEncoding = { "utf-16" },
+    },
+  },
   lua_ls = {
     Lua = {
       workspace = { checkThirdParty = false },
@@ -448,6 +449,18 @@ local servers = {
     },
   },
 }
+
+for _, method in ipairs({ 'textDocument/diagnostic', 'workspace/diagnostic' }) do
+  local default_diagnostic_handler = vim.lsp.handlers[method]
+  vim.lsp.handlers[method] = function(err, result, context, config)
+    if err ~= nil and err.code == -32802 then
+      return
+    end
+    return default_diagnostic_handler(err, result, context, config)
+  end
+end
+
+
 
 -- Setup neovim lua configuration
 require('neodev').setup()
@@ -482,9 +495,31 @@ require('luasnip.loaders.from_vscode').lazy_load()
 luasnip.config.setup {}
 
 cmp.setup {
+  sorting = {
+    priority_weight = 2,
+    comparators = {
+      function(entry1, entry2)
+        local kind1 = entry1:get_kind()
+        local kind2 = entry2:get_kind()
+        if kind1 == cmp.lsp.CompletionItemKind.Field and kind2 ~= cmp.lsp.CompletionItemKind.Field then
+          return true
+        elseif kind1 ~= cmp.lsp.CompletionItemKind.Field and kind2 == cmp.lsp.CompletionItemKind.Field then
+          return false
+        end
+      end,
+      cmp.config.compare.offset,
+      cmp.config.compare.exact,
+      cmp.config.compare.score,
+      cmp.config.compare.recently_used,
+      cmp.config.compare.kind,
+      cmp.config.compare.sort_text,
+      cmp.config.compare.length,
+      cmp.config.compare.order,
+    },
+  },
   snippet = {
     expand = function(args)
-      luasnip.lsp_expand(args.body)
+      require('luasnip').lsp_expand(args.body)
     end,
   },
   mapping = cmp.mapping.preset.insert {
@@ -500,8 +535,8 @@ cmp.setup {
     ['<C-Tab>'] = cmp.mapping(function(fallback)
       if cmp.visible() then
         cmp.select_next_item()
-      elseif luasnip.expand_or_locally_jumpable() then
-        luasnip.expand_or_jump()
+      elseif require('luasnip').expand_or_locally_jumpable() then
+        require('luasnip').expand_or_jump()
       else
         fallback()
       end
@@ -509,8 +544,8 @@ cmp.setup {
     ['<S-Tab>'] = cmp.mapping(function(fallback)
       if cmp.visible() then
         cmp.select_prev_item()
-      elseif luasnip.locally_jumpable(-1) then
-        luasnip.jump(-1)
+      elseif require('luasnip').locally_jumpable(-1) then
+        require('luasnip').jump(-1)
       else
         fallback()
       end
@@ -522,5 +557,24 @@ cmp.setup {
   },
 }
 
+
+vim.defer_fn(function()
+  vim.cmd "colorscheme tragdate"
+end, 0)
+vim.api.nvim_create_autocmd({"VimEnter", "InsertLeave"}, {
+  callback = function() vim.cmd('silent !printf "\\e[6 q"') end
+})
+
+vim.api.nvim_create_autocmd("InsertEnter", {
+  callback = function() vim.cmd('silent !printf "\\e[5 q"') end
+})
+vim.api.nvim_create_autocmd("VimLeave", {
+  callback = function() vim.cmd('silent !printf "\\e[6 q"') end
+})
+
+
+vim.api.nvim_create_autocmd("VimLeave", {
+  callback = function() vim.cmd('silent !echo -ne "\\e[1 q"') end
+})
 -- The line beneath this is called `modeline`. See `:help modeline`
 -- vim: ts=2 sts=2 sw=2 et
