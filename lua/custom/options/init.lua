@@ -46,15 +46,7 @@ end
 vim.api.nvim_create_autocmd('BufWritePre', {
   pattern = '*.rs',
   callback = function()
-    local file = vim.api.nvim_buf_get_name(0)
-    -- Write to disk first (if modified)
-    if vim.bo.modified then
-      vim.api.nvim_command 'write'
-    end
-    -- Run formatter
-    vim.fn.system { 'cargo', '+nightly', 'fmt', '--', file }
-    -- Reload from disk to avoid warning
-    vim.api.nvim_command 'edit!'
+    vim.lsp.buf.format { async = false }
   end,
 })
 
@@ -152,4 +144,12 @@ vim.g.have_nerd_font = true
 -- Turn on relative line numbers
 vim.opt.number = true
 vim.opt.relativenumber = false
+
+-- Set global tab width to 4 spaces
+vim.opt.tabstop = 4
+vim.opt.shiftwidth = 4
+vim.opt.expandtab = true
+
+-- Force global statusline (single statusline for all windows)
+vim.opt.laststatus = 3
 

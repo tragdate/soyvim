@@ -7,11 +7,10 @@ return {
   { 'matze/vim-move' },
   -- Color preview for working with hex colors
   { 'rrethy/vim-hexokinase', build = 'make hexokinase' },
-  -- Theming / add themes here change from init.lua
-  { 'sainnhe/sonokai' },
-  -- Status line
   { 'vim-airline/vim-airline' },
   { 'vim-airline/vim-airline-themes' },
+  -- Theming / add themes here change from init.lua
+  { 'sainnhe/sonokai' },
   -- Neo tree
   {
     'nvim-neo-tree/neo-tree.nvim',
@@ -25,7 +24,8 @@ return {
       require('neo-tree').setup {
         window = {
           position = 'left',
-          width = 22,
+          width = 30,
+          statusline = false,
           mapping_options = {
             noremap = true,
             nowait = true,
@@ -46,7 +46,7 @@ return {
   -- Startup screen
   {
     'startup-nvim/startup.nvim',
-    dependencies = {'nvim-telescope/telescope.nvim', 'nvim-lua/plenary.nvim'},
+    dependencies = { 'nvim-telescope/telescope.nvim', 'nvim-lua/plenary.nvim' },
     config = function()
       require('startup').setup {
         header = {
@@ -124,31 +124,31 @@ return {
     end,
   },
   -- Codeium AI completion
-  {
-    'Exafunction/codeium.vim',
-    config = function()
-      -- Change '<C-g>' here to any keycode you like.
-      vim.keymap.set('i', '<C-g>', function()
-        return vim.fn['codeium#Accept']()
-      end, { expr = true })
-      vim.keymap.set('i', '<c-n>', function()
-        return vim.fn['codeium#CycleCompletions'](1)
-      end, { expr = true })
-      vim.keymap.set('i', '<c-p>', function()
-        return vim.fn['codeium#CycleCompletions'](-1)
-      end, { expr = true })
-      vim.keymap.set('i', '<c-x>', function()
-        return vim.fn['codeium#Clear']()
-      end, { expr = true })
-    end,
-  },
+  -- {
+  --   'Exafunction/codeium.vim',
+  --   config = function()
+  --     -- Change '<C-g>' here to any keycode you like.
+  --     vim.keymap.set('i', '<C-g>', function()
+  --       return vim.fn['codeium#Accept']()
+  --     end, { expr = true })
+  --     vim.keymap.set('i', '<c-n>', function()
+  --       return vim.fn['codeium#CycleCompletions'](1)
+  --     end, { expr = true })
+  --     vim.keymap.set('i', '<c-p>', function()
+  --       return vim.fn['codeium#CycleCompletions'](-1)
+  --     end, { expr = true })
+  --     vim.keymap.set('i', '<c-x>', function()
+  --       return vim.fn['codeium#Clear']()
+  --     end, { expr = true })
+  --   end,
+  -- },
   -- LazyGit integration
   {
     'kdheepak/lazygit.nvim',
-    cmd = "LazyGit",
+    cmd = 'LazyGit',
     -- Add keymaps
     keys = {
-      { "<leader>lg", "<cmd>LazyGit<CR>", desc = "Open LazyGit" },
+      { '<leader>lg', '<cmd>LazyGit<CR>', desc = 'Open LazyGit' },
     },
   },
   -- Auto-formatting using conform.nvim

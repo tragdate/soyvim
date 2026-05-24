@@ -118,6 +118,57 @@ vim.o.showmode = false
 --  Remove this option if you want your OS clipboard to remain independent.
 --  See `:help 'clipboard'`
 vim.schedule(function()
+  -- Unified TTY clipboard support for terminal multiplexers
+  if vim.env.TERM and (vim.env.TERM:match("^screen") or vim.env.TERM:match("^tmux") or vim.env.ZELLIJ) then
+    -- Unified copy function: OSC52 + file backup + primary selection
+    local function unified_copy(text)
+      if not text or text == '' then return end
+      
+      -- Save to file (always works in TTY)
+      local home = os.getenv('HOME')
+      local clipboard_file = home .. '/.clipboard'
+      local file = io.open(clipboard_file, 'w')
+      if file then
+        file:write(text)
+        file:close()
+      end
+      
+      -- OSC52 for system clipboard
+      local encoded = vim.fn.system('echo -n ' .. vim.fn.shellescape(text) .. ' | base64 -w0'):gsub('\n', '')
+      vim.fn.system('echo -ne "\\033]52;c;' .. encoded .. '\\033\\\\" > /dev/tty')
+      -- OSC52 for primary selection (middle-click)
+      vim.fn.system('echo -ne "\\033]52;p;' .. encoded .. '\\033\\\\" > /dev/tty')
+    end
+    
+    -- Unified paste function: file-based (most reliable)
+    local function unified_paste()
+      local home = os.getenv('HOME')
+      local clipboard_file = home .. '/.clipboard'
+      local file = io.open(clipboard_file, 'r')
+      if file then
+        local content = file:read('*all')
+        file:close()
+        if content and content ~= '' then
+          return vim.split(content, '\n')
+        end
+      end
+      return {}
+    end
+    
+    -- Set up unified clipboard provider for terminal environments
+    vim.g.clipboard = {
+      name = 'unified_tty',
+      copy = {
+        ['+'] = function(lines) unified_copy(table.concat(lines, '\n')) end,
+        ['*'] = function(lines) unified_copy(table.concat(lines, '\n')) end,
+      },
+      paste = {
+        ['+'] = unified_paste,
+        ['*'] = unified_paste,
+      },
+    }
+  end
+  
   vim.o.clipboard = 'unnamedplus'
 end)
 
@@ -637,7 +688,7 @@ require('lazy').setup({
       vim.diagnostic.config {
         severity_sort = true,
         float = { border = 'rounded', source = 'if_many' },
-        underline = { severity = vim.diagnostic.severity.ERROR },
+        underline = true,
         signs = vim.g.have_nerd_font and {
           text = {
             [vim.diagnostic.severity.ERROR] = '󰅚 ',
@@ -680,7 +731,9 @@ require('lazy').setup({
         -- clangd = {},
         -- gopls = {},
         -- pyright = {},
-        -- rust_analyzer = {},
+        rust_analyzer = {
+          cmd = { "rustup", "run", "stable", "rust-analyzer" },
+        },
         -- ... etc. See `:help lspconfig-all` for a list of all the pre-configured LSPs
         --
         -- Some languages (like typescript) have entire language plugins that can be useful:
