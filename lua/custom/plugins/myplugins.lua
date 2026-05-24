@@ -3,6 +3,15 @@
 
 local function gh(repo) return 'https://github.com/' .. repo end
 
+-- Build hook MUST be registered before vim.pack.add so install/update events fire it
+vim.api.nvim_create_autocmd('PackChanged', {
+  callback = function(ev)
+    if ev.data.spec.name == 'vim-hexokinase' and (ev.data.kind == 'install' or ev.data.kind == 'update') then
+      vim.system({ 'make', 'hexokinase' }, { cwd = ev.data.path }):wait()
+    end
+  end,
+})
+
 -- Plugins with no setup() needed
 vim.pack.add {
   gh 'matze/vim-move',
@@ -115,11 +124,3 @@ require('startup').setup {
   parts = { 'header', 'body', 'footer' },
 }
 
--- Build hook for hexokinase (vim.pack PackChanged listener)
-vim.api.nvim_create_autocmd('PackChanged', {
-  callback = function(ev)
-    if ev.data.spec.name == 'vim-hexokinase' and (ev.data.kind == 'install' or ev.data.kind == 'update') then
-      vim.system({ 'make', 'hexokinase' }, { cwd = ev.data.path }):wait()
-    end
-  end,
-})
